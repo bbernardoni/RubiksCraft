@@ -1,0 +1,355 @@
+package net.minecraft.src;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import net.minecraft.client.Minecraft;
+import org.lwjgl.Sys;
+
+public class GuiCubeSettings extends GuiScreen {
+
+	int state;
+	int[] cs = {0xffffffff, 0xffffff00, 0xffff0000, 0xff00ff00, 0xff0000ff, 0xffff8000};
+	GuiTextField tfR;
+	GuiTextField tfG;
+	GuiTextField tfB;
+	
+	public void initGui(){
+		state = 0;
+		controlList.clear();
+		controlList.add(new GuiButton(0, (width-256)/2+15,  (height-176)/2+40, 112, 20, "About"));
+		controlList.add(new GuiButton(1, (width-256)/2+129, (height-176)/2+40, 112, 20, "Controls"));
+		controlList.add(new GuiButton(2, (width-256)/2+15,  (height-176)/2+62, 112, 20, "Start A New Session"));
+		controlList.add(new GuiButton(3, (width-256)/2+129, (height-176)/2+62, 112, 20, "Delete This Session"));
+		controlList.add(new GuiButton(4, (width-256)/2+15,  (height-176)/2+84, 112, 20, "Open Times Folder"));
+		controlList.add(new GuiButton(5, (width-256)/2+129, (height-176)/2+84, 112, 20, "Create Stats File"));
+		controlList.add(new GuiButton(6, (width-256)/2+15,  (height+176)/2-30, 226, 20, "Back"));
+		controlList.add(new GuiButton(7, (width-256)/2+15,  (height-176)/2+106, 226, 20, "Color Scheme"));
+		controlList.add(new GuiButton(8, (width-256)/2+15,  (height+176)/2-30, 226, 20, "Back"));
+		controlList.add(new GuiButton(9, (width-256)/2+16,  (height+176)/2-30, 225, 20, "Back"));
+		controlList.add(new GuiButton(10, (width-256)/2+15,  (height+176)/2-30, 226, 20, "Back"));
+		controlList.add(new GuiButton(11, (width-256)/2+15,  (height-176)/2+79, 34, 20, "Red"));
+		controlList.add(new GuiButton(12, (width-256)/2+51,  (height-176)/2+79, 38, 20, "Orange"));
+		controlList.add(new GuiButton(13, (width-256)/2+91,  (height-176)/2+79, 36, 20, "Yellow"));
+		controlList.add(new GuiButton(14, (width-256)/2+129,  (height-176)/2+79, 36, 20, "Green"));
+		controlList.add(new GuiButton(15, (width-256)/2+167,  (height-176)/2+79, 34, 20, "Blue"));
+		controlList.add(new GuiButton(16, (width-256)/2+203,  (height-176)/2+79, 38, 20, "Purple"));
+		controlList.add(new GuiButton(17, (width-256)/2+15,  (height-176)/2+103, 34, 20, "White"));
+		controlList.add(new GuiButton(18, (width-256)/2+51,  (height-176)/2+103, 38, 20, "Gray"));
+		controlList.add(new GuiButton(19, (width-256)/2+91,  (height-176)/2+103, 36, 20, "Black"));
+		controlList.add(new GuiButton(20, (width-256)/2+129,  (height-176)/2+103, 36, 20, "Brown"));
+		controlList.add(new GuiButton(21, (width-256)/2+167,  (height-176)/2+103, 34, 20, "Pink"));
+		controlList.add(new GuiButton(22, (width-256)/2+203,  (height-176)/2+103, 38, 20, "Default"));
+		for(int i=8; i<23; i++)
+			((GuiButton)controlList.get(i)).enabled = false;
+		tfR = new GuiTextField(fontRenderer, (width-256)/2+40, (height-176)/2+60, 50, 15);
+		tfR.setMaxStringLength(2);
+		tfG = new GuiTextField(fontRenderer, (width-256)/2+115, (height-176)/2+60, 50, 15);
+		tfG.setMaxStringLength(2);
+		tfB = new GuiTextField(fontRenderer, (width-256)/2+190, (height-176)/2+60, 50, 15);
+		tfB.setMaxStringLength(2);
+	}
+
+	protected void actionPerformed(GuiButton guibutton){
+		switch(guibutton.id){
+		case 0:
+			state = 1;
+			for (int k = 0; k < 8; k++)
+				((GuiButton)controlList.get(k)).enabled = false;
+			((GuiButton)controlList.get(8)).enabled = true;
+			break;
+		case 1:
+			state = 2;
+			for (int k = 0; k < 8; k++)
+				((GuiButton)controlList.get(k)).enabled = false;
+			((GuiButton)controlList.get(9)).enabled = true;
+			break;
+		case 2:
+			try{
+				File file = new File(mc.getMinecraftDir() + "/mods/mod_RubiksCraft/times.txt");
+				boolean suc = true;
+				for(int i = 1; suc;	i++)
+					if(!(new File(mc.getMinecraftDir() + "/mods/mod_RubiksCraft/times" + i + ".txt")).exists())
+						suc = !file.renameTo(new File(mc.getMinecraftDir() + "/mods/mod_RubiksCraft/times" + i + ".txt"));
+			}catch (Exception ex){}
+			break;
+		case 3:
+			try{
+        		FileOutputStream erasor = new FileOutputStream(ModLoader.getMinecraftInstance().getMinecraftDir() + "/mods/mod_RubiksCraft/times.txt");
+        		erasor.write(null);
+        		erasor.close();
+    		}catch (Exception ex){}
+			break;
+		case 4:
+			String fileLocation = (new File(Minecraft.getMinecraftDir() + "/mods/mod_RubiksCraft")).getAbsolutePath();
+			if (Minecraft.getOs() == EnumOS.MACOS){
+                try{
+                    System.out.println(fileLocation);
+                    Runtime.getRuntime().exec(new String[] {"/usr/bin/open", fileLocation});
+                    return;
+                }catch (IOException var7){var7.printStackTrace();}
+            }else if (Minecraft.getOs() == EnumOS.WINDOWS){
+                String var2 = String.format("cmd.exe /C start \"Open file\" \"%s\"", new Object[] {fileLocation});
+
+                try{
+                    Runtime.getRuntime().exec(var2);
+                    return;
+                }catch (IOException var6){var6.printStackTrace();}
+            }
+			boolean var8 = false;
+            try{
+                Class var3 = Class.forName("java.awt.Desktop");
+                Object var4 = var3.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
+                var3.getMethod("browse", new Class[] {URI.class}).invoke(var4, new Object[] {(new File(Minecraft.getMinecraftDir(), "/mods/mod_RubiksCraft")).toURI()});
+            }catch (Throwable var5){var5.printStackTrace();		var8 = true;}
+            if (var8){
+                System.out.println("Opening via system class!");
+                Sys.openURL("file://" + fileLocation);
+            }
+			break;
+		case 5:
+			try {
+				ArrayList<Float> times = new ArrayList<Float>();
+			    BufferedReader in = new BufferedReader(new FileReader(Minecraft.getMinecraftDir() + "/mods/mod_RubiksCraft/times.txt"));
+			    String str;
+			    while ((str = in.readLine()) != null) {
+			    	times.add(Float.parseFloat(str));
+			    }
+			    in.close();
+			    int s = times.size();
+			    if(s != 0){
+				    File file = new File(ModLoader.getMinecraftInstance().getMinecraftDir() + "/mods/mod_RubiksCraft");
+					file.mkdirs();
+				    BufferedWriter out = new BufferedWriter(new FileWriter(file + "/stats.txt"));
+				    out.write("Number of times: "+s+"\n");
+			        out.write("Best time: "+smallest(times)+"\n");
+			        out.write("Worst time: "+largest(times)+"\n");
+			        if(s>=5){
+			        	out.write("Current average of 5: "+cur(times,5)+"\n");
+			        	out.write("Best average of 5: "+best(times,5)+"\n");
+				        if(s>=12){
+				        	out.write("Current average of 12: "+cur(times,12)+"\n");
+				        	out.write("Best average of 12: "+best(times,12)+"\n");
+					        if(s>=25){
+					        	out.write("Current average of 25: "+cur(times,25)+"\n");
+					        	out.write("Best average of 25: "+best(times,25)+"\n");
+						        if(s>=50){
+						        	out.write("Current average of 50: "+cur(times,50)+"\n");
+						        	out.write("Best average of 50: "+best(times,50)+"\n");
+							        if(s>=100){
+							        	out.write("Current average of 100: "+cur(times,100)+"\n");
+							        	out.write("Best average of 100: "+best(times,100)+"\n");
+							        }
+						        }
+					        }
+				        }
+			        }
+			        out.write("Times:");
+			        for(int i = 0;i < s;i++)
+				    	out.write(" "+times.get(i));
+				    out.close();
+				}
+			} catch (IOException e) {}
+			break;
+		case 6:
+			mc.displayGuiScreen(new GuiCubeSim());
+			break;
+		case 7:
+			state = 3;
+			for (int k = 0; k < 8; k++)
+				((GuiButton)controlList.get(k)).enabled = false;
+			for (int k = 10; k < 23; k++)
+				((GuiButton)controlList.get(k)).enabled = true;
+			try {
+			    BufferedReader in = new BufferedReader(new FileReader(Minecraft.getMinecraftDir() + "/mods/mod_RubiksCraft/options.txt"));
+			    String str;
+			    for (int i=0; i<6; i++) {
+			    	str = in.readLine();
+			    	cs[i]=(Integer.parseInt(str));
+			    }
+			    in.close();
+			} catch (IOException e) {}
+			break;
+		case 8:
+			state = 0;
+			for (int k = 0; k < 8; k++)
+				((GuiButton)controlList.get(k)).enabled = true;
+			((GuiButton)controlList.get(8)).enabled = false;
+			break;
+		case 9:
+			state = 0;
+			for (int k = 0; k < 8; k++)
+				((GuiButton)controlList.get(k)).enabled = true;
+			((GuiButton)controlList.get(9)).enabled = false;
+			break;
+		case 10:
+			state = 0;
+			for (int k = 0; k < 8; k++)
+				((GuiButton)controlList.get(k)).enabled = true;
+			for (int k = 10; k < 23; k++)
+				((GuiButton)controlList.get(k)).enabled = false;
+			break;
+		default:}
+	}
+	
+	public void drawScreen(int i, int j, float f){
+		drawDefaultBackground();
+		mc.renderEngine.bindTexture(mc.renderEngine.getTexture("/RubiksCraft/backGui.png"));
+        drawTexturedModalRect((width-256)/2, (height-176)/2, 0, 0, 256, 176);
+		switch(state){
+		case 0:
+			centeredString(fontRenderer, "Cube Simulator Options", width/2, (height-176)/2+18, 0x000000);
+			for (int k = 0; k < 8; k++)
+	            ((GuiButton)controlList.get(k)).drawButton(mc, i, j);
+        	break;
+		case 1:
+			centeredString(fontRenderer, "About", width/2, (height-176)/2+18, 0x000000);
+			centeredString(fontRenderer, "Created By: Bennett Bernardoni", width/2, (height-176)/2+40, 0x000000);
+			centeredString(fontRenderer, "For help or bug reports", width/2, (height-176)/2+55, 0x000000);
+			centeredString(fontRenderer, "send me a message at", width/2, (height-176)/2+65, 0x000000);
+			centeredString(fontRenderer, "beezer28@comcast.net", width/2, (height-176)/2+75, 0x000000);
+			centeredString(fontRenderer, "Verison 1.1", width/2, (height-176)/2+95, 0x000000);
+			centeredString(fontRenderer, "This mod includes Auto Cubes, and CubeSim", width/2, (height-176)/2+110, 0x000000);
+			((GuiButton)controlList.get(8)).drawButton(mc, i, j);
+			break;
+		case 2:
+			centeredString(fontRenderer, "Controls", width/2, (height-176)/2+18, 0x000000);
+			centeredString(fontRenderer, "Scramble - Space", width/2, (height-176)/2+40, 0x000000);
+			centeredString(fontRenderer, "Reset - Backspace", width/2, (height-176)/2+50, 0x000000);
+			centeredString(fontRenderer, "(For the Keys Clockwise/Counter-Clockwise)", width/2, (height-176)/2+90, 0x000000);
+			for(int x=103; x<=143; x+=10)
+				drawHorizontalLine((width-256)/2+16, (width+256)/2-16, (height-176)/2+x, 0xff000000);
+			for(int x=16; x<=240; x+=28)
+				drawVerticalLine((width-256)/2+x, (height-176)/2+103, (height-176)/2+143, 0xff000000);
+			centeredString(fontRenderer, "Move", (width-256)/2+31,  (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "Key",  (width-256)/2+59,  (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "Move", (width-256)/2+87,  (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "Key",  (width-256)/2+115, (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "Move", (width-256)/2+143, (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "Key",  (width-256)/2+171, (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "Move", (width-256)/2+199, (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "Key",  (width-256)/2+227, (height-176)/2+105, 0x000000);
+			centeredString(fontRenderer, "U",    (width-256)/2+31,  (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "J/F",  (width-256)/2+59,  (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "D",    (width-256)/2+87,  (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "S/L",  (width-256)/2+115, (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "x",    (width-256)/2+143, (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "Y/N",  (width-256)/2+171, (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "M",    (width-256)/2+199, (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "T/B",  (width-256)/2+227, (height-176)/2+115, 0x000000);
+			centeredString(fontRenderer, "R",    (width-256)/2+31,  (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, "I/K",  (width-256)/2+59,  (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, "L",    (width-256)/2+87,  (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, "D/E",  (width-256)/2+115, (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, "y",    (width-256)/2+143, (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, ";/A",  (width-256)/2+171, (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, "r",    (width-256)/2+199, (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, "U/M",  (width-256)/2+227, (height-176)/2+125, 0x000000);
+			centeredString(fontRenderer, "F",    (width-256)/2+31,  (height-176)/2+135, 0x000000);
+			centeredString(fontRenderer, "H/G",  (width-256)/2+59,  (height-176)/2+135, 0x000000);
+			centeredString(fontRenderer, "B",    (width-256)/2+87,  (height-176)/2+135, 0x000000);
+			centeredString(fontRenderer, "W/O",  (width-256)/2+115, (height-176)/2+135, 0x000000);
+			centeredString(fontRenderer, "z",    (width-256)/2+143, (height-176)/2+135, 0x000000);
+			centeredString(fontRenderer, "P/Q",  (width-256)/2+171, (height-176)/2+135, 0x000000);
+			centeredString(fontRenderer, "l",    (width-256)/2+199, (height-176)/2+135, 0x000000);
+			centeredString(fontRenderer, "V/R",  (width-256)/2+227, (height-176)/2+135, 0x000000);
+			((GuiButton)controlList.get(9)).drawButton(mc, i, j);
+			break;
+		case 3:
+			centeredString(fontRenderer, "Color Scheme Chooser", width/2, (height-176)/2+18, 0x000000);
+			centeredString(fontRenderer, "enter hex code or choose a common color", width/2, (height-176)/2+35, 0x000000);
+			centeredString(fontRenderer, "after color is choosen, choose face with the key", width/2, (height-176)/2+45, 0x000000);
+			tfR.drawTextBox();
+			tfG.drawTextBox();
+			tfB.drawTextBox();
+			centeredString(fontRenderer, "R", (width-256)/2+30, (height-176)/2+63, 0x000000);
+			centeredString(fontRenderer, "G", (width-256)/2+105, (height-176)/2+63, 0x000000);
+			centeredString(fontRenderer, "B", (width-256)/2+180, (height-176)/2+63, 0x000000);
+			centeredString(fontRenderer, "U-1", (width-256)/2+25, (height-176)/2+130, 0x000000);
+			drawRect((width-256)/2+36, (height-176)/2+127, (width-256)/2+51, (height-176)/2+140, cs[0]);
+			centeredString(fontRenderer, "D-2", (width-256)/2+63, (height-176)/2+130, 0x000000);
+			drawRect((width-256)/2+74, (height-176)/2+127, (width-256)/2+89, (height-176)/2+140, cs[1]);
+			centeredString(fontRenderer, "L-3", (width-256)/2+101, (height-176)/2+130, 0x000000);
+			drawRect((width-256)/2+112, (height-176)/2+127, (width-256)/2+127, (height-176)/2+140, cs[2]);
+			centeredString(fontRenderer, "F-4", (width-256)/2+139, (height-176)/2+130, 0x000000);
+			drawRect((width-256)/2+150, (height-176)/2+127, (width-256)/2+165, (height-176)/2+140, cs[3]);
+			centeredString(fontRenderer, "R-5", (width-256)/2+177, (height-176)/2+130, 0x000000);
+			drawRect((width-256)/2+188, (height-176)/2+127, (width-256)/2+203, (height-176)/2+140, cs[4]);
+			centeredString(fontRenderer, "B-6", (width-256)/2+215, (height-176)/2+130, 0x000000);
+			drawRect((width-256)/2+226, (height-176)/2+127, (width-256)/2+241, (height-176)/2+140, cs[5]);
+			for (int k = 10; k < 23; k++)
+				((GuiButton)controlList.get(k)).drawButton(mc, i, j);
+			break;
+		}
+	}
+	
+	public float largest(ArrayList<Float> times){
+		float largest = times.get(0);
+        for(int i=1; i<times.size(); i++)
+            if(times.get(i)>largest)
+            	largest = times.get(i);
+        return largest;
+	}
+	public float smallest(ArrayList<Float> times){
+		float smallest = times.get(0);
+        for(int i=1; i<times.size(); i++)
+            if(times.get(i)<smallest)
+            	smallest = times.get(i);
+        return smallest;
+	}
+	public String best(ArrayList<Float> times, int n){
+		float smallest = Float.MAX_VALUE;
+		for(int i=0; i<=times.size()-n; i++){
+			float f = 0;
+			for(int j=0; j<n; j++)
+				f += times.get(j+i);
+			f -= largest(new ArrayList(times.subList(i, i+n-1)));
+			f -= smallest(new ArrayList(times.subList(i, i+n-1)));
+			if(f<smallest)
+            	smallest = f;
+		}
+		return ""+(float)Math.round(smallest/(n-2)*1000)/1000;
+	}
+	public String cur(ArrayList<Float> times, int n){
+		float f = 0;
+		for(int i=-n; i<0; i++)
+			f += times.get(times.size()+i);
+		f -= largest(new ArrayList(times.subList(times.size()-n, times.size()-1)));
+		f -= smallest(new ArrayList(times.subList(times.size()-n, times.size()-1)));
+		return ""+(float)Math.round(f/(n-2)*1000)/1000;
+	}
+	
+	public void centeredString(FontRenderer par1FontRenderer, String par2Str, int par3, int par4, int par5){
+        par1FontRenderer.drawString(par2Str, par3 - par1FontRenderer.getStringWidth(par2Str) / 2, par4, par5);
+    }
+	
+	protected void mouseClicked(int par1, int par2, int par3){
+		super.mouseClicked(par1, par2, par3);
+		tfR.mouseClicked(par1, par2, par3);
+		tfG.mouseClicked(par1, par2, par3);
+		tfB.mouseClicked(par1, par2, par3);
+	}
+	
+	protected void keyTyped(char par1, int par2){
+        if (par2 == 1)
+            mc.displayGuiScreen(new GuiCubeSim());
+        if (state == 3){
+        	if(par2>=2 && par2<=7 && !tfR.isFocused() && !tfG.isFocused() && !tfB.isFocused()){
+        		int x = Integer.parseInt(tfR.getText()+tfG.getText()+tfB.getText(), 16);
+        		x |= 0xff000000;
+        		cs[par2-2] = x;
+        	}
+        	tfR.textboxKeyTyped(par1, par2);
+        	tfG.textboxKeyTyped(par1, par2);
+        	tfB.textboxKeyTyped(par1, par2);
+        }
+    }
+}

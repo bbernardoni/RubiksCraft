@@ -1,0 +1,22 @@
+14:01:44 - !! Updates available. Please run updatemcp to get them. !!
+14:01:44 - !! Modified jar detected. Unpredictable results !!
+14:08:02 - 'runtime\bin\applydiff.exe -p1 -u -i ..\..\temp\temp.patch -d src\minecraft' failed : 1
+14:08:02 - 
+14:08:02 - == ERRORS FOUND ==
+14:08:02 - 
+14:08:02 - 2 out of 2 hunks ignored -- saving rejects to file 'net\minecraft\src\IntegratedSer#'
+14:08:02 - ==================
+14:08:02 - 
+14:10:54 - !! Missing server jar file. Aborting !!
+12:44:27 - !! Can not find server sources, try decompiling !!
+12:46:04 - !! Can not find server md5s !!
+13:32:38 - !! Can not find server sources, try decompiling !!
+13:33:25 - !! Can not find server md5s !!
+21:40:10 - !! Can not find server sources, try decompiling !!
+21:40:49 - !! Can not find server md5s !!
+22:41:11 - !! Can not find server sources, try decompiling !!
+22:41:54 - !! Can not find server md5s !!
+18:31:51 - !! Can not find server sources, try decompiling !!
+18:35:01 - !! Can not find server md5s !!
+14:08:32 - !! Can not find server sources, try decompiling !!
+14:10:21 - !! Can not find server md5s !!
